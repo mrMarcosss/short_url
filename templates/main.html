@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center mt-4 mb-4">Make a short URL!</h1>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="mb-5">
+                <form method="post" action="." id="urlForm">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group{% if form.errors %} is-invalid{% endif %}">
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary float-right">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var $form = $('#urlForm')
+        $form.on('submit', function (e) {
+            e.preventDefault()
+            $.ajax({
+                method: "POST",
+                url: $form.attr('action'),
+                data: $form.serialize(),
+                success: function (data) {
+                    $form[0].reset();
+                    var obj = $.parseJSON(data);
+                    if (!((document.documentElement.textContent || document.documentElement.innerText).indexOf(obj.new) > -1)) {
+                        $( ".row" ).append('<div class="col-6 offset-3 mt-5"><div class="card"><div class="card-body"><span><a target="_blank" href="/' + obj.short + '">' + obj.new + '</a></span><button class="btn btn-success btn-sm float-right copy">copy</button></div></div></div>');
+                    }
+                }
+            })
+        })
+
+        $('body').on('click', 'button.copy', function (){
+            $(".copied").remove();
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val($(this).siblings().text()).select();
+            document.execCommand("copy");
+            $temp.remove();
+            $(this).parent().parent().append('<span style="position: absolute; font-size: 11px; right: 5px" class="text-muted copied">copied</span>')
+        })
+    </script>
+{% endblock %}
