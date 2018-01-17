@@ -34,4 +34,4 @@ class HoveView(View):
                  'short': obj.short
                  }
             ))
-        return self.get(request, *args, **kwargs)
+        return HttpResponse(json.dumps({'errors': form.errors}))

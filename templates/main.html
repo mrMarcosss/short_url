@@ -8,7 +8,7 @@
                 <form method="post" action="." id="urlForm">
                     {% csrf_token %}
                     {% for field in form %}
-                        <div class="form-group{% if form.errors %} is-invalid{% endif %}">
+                        <div class="form-group">
                             {{ field }}
                         </div>
                     {% endfor %}
@@ -29,8 +29,15 @@
                 success: function (data) {
                     $form[0].reset();
                     var obj = $.parseJSON(data);
-                    if (!((document.documentElement.textContent || document.documentElement.innerText).indexOf(obj.new) > -1)) {
-                        $( ".row" ).append('<div class="col-6 offset-3 mt-5"><div class="card"><div class="card-body"><span><a target="_blank" href="/' + obj.short + '">' + obj.new + '</a></span><button class="btn btn-success btn-sm float-right copy">copy</button></div></div></div>');
+                    if (obj.hasOwnProperty('errors')) {
+                        $('.form-group input').addClass('is-invalid')
+                        $('.form-group').append('<span style="color: red">' + obj.errors.url + '<span>')
+                    } else {
+                        $('.form-group input').removeClass('is-invalid')
+                        $('.form-group span').remove()
+                        if (!((document.documentElement.textContent || document.documentElement.innerText).indexOf(obj.new) > -1)) {
+                            $( ".row" ).append('<div class="col-6 offset-3 mt-5"><div class="card"><div class="card-body"><span><a target="_blank" href="/' + obj.short + '">' + obj.new + '</a></span><button class="btn btn-success btn-sm float-right copy">copy</button></div></div></div>');
+                        }
                     }
                 }
             })
